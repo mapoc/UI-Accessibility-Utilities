@@ -1,21 +1,48 @@
-import json
-import pytest
-
-from common import Request, Response, set_environment
+import unittest
+from mashop.microtoolkit.toolkit import status_codes, APIError
+from conftest import Request, Response
 from mashop.api.ui_accessibility_utilities import http_get
 
-@pytest.fixture(scope="module")
-def micro_setup_data(setup_env, setup_common_api_params):
 
-    return setup_common_api_params
+class TestUIAccessibilityUtilitiesSuccess(unittest.TestCase):
+    def setUp(self):
+        self.req = Request(params={"color": ["221", "182", "137"]})
+        self.resp = Response()
+        self.params = {}
 
+    def test_get_ui_accessibility_utilities_mocked(self):
+        http_get(self.req, self.resp, self.params)
+        self.assertTrue(self.resp.status, status_codes.HTTP_OK)
 
+class TestUIAccessibilityUtilitiesFailure(unittest.TestCase):
+    def setUp(self):
+        self.resp = Response()
+        self.params = {}
 
-def test_get_hello_world(micro_setup_data):
-    # ---------- call method ----------
-    http_get(micro_setup_data['req'], micro_setup_data['resp'], micro_setup_data['params'])
+    def test_get_ui_accessibility_utilities_invalid_param_name_mocked(self):
+        self.req = Request(params={"clor": ["221", "182", "137"]})
+        # ---------- call method ----------
+        with self.assertRaises(APIError) as context:
+            http_get(self.req, self.resp, self.params)
+            self.assertTrue(self.resp.status, status_codes.HTTP_CREATED)
+        # ---------- evaluate response ----------
+        self.assertEqual(context.exception.code, 'Invalid Input: color')
 
-    # ---------- evaluate response ----------
-    message = micro_setup_data['resp'].body['message']
+    def test_get_ui_accessibility_utilities_not_3_values_mocked(self):
+        self.req = Request(params={"color": ["221", "182"]})
+        # ---------- call method ----------
+        with self.assertRaises(APIError) as context:
+            http_get(self.req, self.resp, self.params)
+            self.assertTrue(self.resp.status, status_codes.HTTP_CREATED)
+        # ---------- evaluate response ----------
+        self.assertEqual(context.exception.code, 'Insufficient number of Input: color')
 
-    assert (message == 'hello world')
+    def test_get_ui_accessibility_utilities_invalid_input_mocked(self):
+        self.req = Request(params={"color": ["221", "182", "aa"]})
+        # ---------- call method ----------
+        with self.assertRaises(APIError) as context:
+            http_get(self.req, self.resp, self.params)
+            self.assertTrue(self.resp.status, status_codes.HTTP_CREATED)
+        # ---------- evaluate response ----------
+        self.assertEqual(context.exception.code, f'Invalid Input: {self.req.params.get("color")} not a number')
+

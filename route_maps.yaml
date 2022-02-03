@@ -1,5 +1,5 @@
 routes:
-    - route: 'hello-world'
+    - route: 'color/rgb'
       module_map:
         GET:
           module_name: 'mashop.api.ui_accessibility_utilities'
