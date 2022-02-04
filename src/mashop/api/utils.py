@@ -1176,8 +1176,8 @@ def validate_params(params, required_params=None):
         for param, param_type in required_params.items():
             if param not in params:
                 raise_invalid_param_error(param, f'{param} is required')
-            if type(params[param]) is not type(param_type):
-                raise_invalid_param_error(param, f'{param} must be type {type(param).__name__}')
+            if type(params[param]) != param_type:
+                raise_invalid_param_error(param, f'{param} must be type {param_type.__name__}')
     return None
 
 

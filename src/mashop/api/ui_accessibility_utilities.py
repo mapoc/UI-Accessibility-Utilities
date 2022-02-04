@@ -21,7 +21,7 @@ def http_get(request, response, params):
                            server_message='Invalid Input: color',
                            server_control_name='errInvalidColor')
                        )
-    required_params = {'color': [str]}
+    required_params = {'color': list}
     validate_params(request.params, required_params=required_params)
     logger.debug(f'Check the query param contains 3 values for RGB color')
     if len(query_param) !=3:
